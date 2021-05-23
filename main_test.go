@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/manzanit0/gymgo/pkg/classes"
@@ -43,9 +44,21 @@ func TestCreateClass_ok(t *testing.T) {
 		t.Errorf("expected status 201, got %d", res.StatusCode)
 	}
 
-	resBody, _ := ioutil.ReadAll(req.Body)
-	if string(resBody) != string(body) {
-		t.Errorf("response should contain request entity, but got %s", string(resBody))
+	resBody, _ := ioutil.ReadAll(res.Body)
+	if strings.Contains(string(resBody), `"name": "Foo"`) {
+		t.Errorf("expected response to contain name, got %d", resBody)
+	}
+
+	if strings.Contains(string(resBody), `"start_date": "1993-02-34"`) {
+		t.Errorf("expected response to contain start_date, got %d", resBody)
+	}
+
+	if strings.Contains(string(resBody), `"end_date": "2021-04-21"`) {
+		t.Errorf("expected response to contain end_date, got %d", resBody)
+	}
+
+	if strings.Contains(string(resBody), `"capacity": 20`) {
+		t.Errorf("expected response to contain capacity, got %d", resBody)
 	}
 }
 
@@ -286,5 +299,50 @@ func TestCreateClass_cannotOverwriteAnExistingClass(t *testing.T) {
 	resBody, _ = ioutil.ReadAll(res.Body)
 	if !strings.Contains(string(resBody), "class already exists") {
 		t.Errorf("expected parsing error, but got: %s", string(resBody))
+	}
+}
+
+func TestBookClass_ok(t *testing.T) {
+	t.Cleanup(func() {
+		classes.DeleteClasses()
+	})
+
+	err := classes.CreateClass("Kung-Fu", time.Date(1993, 2, 24, 0, 0, 0, 0, time.UTC), time.Now(), 5)
+	if err != nil {
+		t.Errorf("was not expecting error, got %s", err.Error())
+	}
+
+	app := fiber.New()
+	setupRouter(app)
+
+	body := []byte(`
+	{
+		"member_name": "James",
+		"class_date": "1993-02-24"
+	}`)
+
+	req, err := http.NewRequest("PUT", "http://10.0.0.1/bookings", bytes.NewReader(body))
+	if err != nil {
+		t.Errorf("error %v not expected", err.Error())
+	}
+
+	req.Header.Add("content-type", "application/json")
+
+	res, err := app.Test(req)
+	if err != nil {
+		t.Errorf("error %v not expected", err.Error())
+	}
+
+	if res.StatusCode != 201 {
+		t.Errorf("expected status 201, got %d", res.StatusCode)
+	}
+
+	resBody, _ := ioutil.ReadAll(res.Body)
+	if strings.Contains(string(resBody), `"member_name": "James"`) {
+		t.Errorf("expected response to contain member_name, got %d", resBody)
+	}
+
+	if strings.Contains(string(resBody), `"class_date": "1994-02-24"`) {
+		t.Errorf("expected response to contain class_date, got %d", resBody)
 	}
 }
