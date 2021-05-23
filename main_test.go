@@ -20,22 +20,15 @@ func TestCreateClass_ok(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"start_date": "1993-02-24",
 		"end_date": "2021-04-21",
 		"capacity": 20
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -66,20 +59,13 @@ func TestCreateClass_missingName(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"start_date": "1993-02-24",
 		"end_date": "1993-02-24"
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -97,20 +83,13 @@ func TestCreateClass_missingStartDate(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"end_date": "1993-02-24"
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -129,20 +108,13 @@ func TestCreateClass_missingEndDate(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"start_date": "1993-02-24"
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -161,21 +133,14 @@ func TestCreateClass_missingCapacity(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"start_date": "1993-02-24",
 		"end_date": "2021-04-21"
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -194,21 +159,14 @@ func TestCreateClass_invalidDate(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"start_date": "1993-02-24",
 		"end_date": "nope"
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -227,22 +185,15 @@ func TestCreateClass_startDateIsSmaller(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"start_date": "1993-02-24",
 		"end_date": "1993-02-21",
 		"capacity": 20
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	res, err := app.Test(req)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
 	}
@@ -265,38 +216,25 @@ func TestCreateClass_cannotOverwriteAnExistingClass(t *testing.T) {
 	app := fiber.New()
 	setupRouter(app)
 
-	body := []byte(`
+	payload := `
 	{
 		"name": "Foo",
 		"start_date": "1993-02-24",
 		"end_date": "2021-04-21",
 		"capacity": 20
-	}`)
+	}`
 
-	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
+	putClasses(app, payload)
+	res, err := putClasses(app, payload)
 	if err != nil {
 		t.Errorf("error %v not expected", err.Error())
-	}
-
-	req.Header.Add("content-type", "application/json")
-
-	// Run the same request twice to provoke a duplicate class.
-	res, err := app.Test(req)
-	res, err = app.Test(req)
-	if err != nil {
-		t.Errorf("error %v not expected", err.Error())
-	}
-
-	resBody, _ := ioutil.ReadAll(req.Body)
-	if string(resBody) != string(body) {
-		t.Errorf("response should contain request entity, but got %s", string(resBody))
 	}
 
 	if res.StatusCode != 400 {
 		t.Errorf("expected status 400, got %d", res.StatusCode)
 	}
 
-	resBody, _ = ioutil.ReadAll(res.Body)
+	resBody, _ := ioutil.ReadAll(res.Body)
 	if !strings.Contains(string(resBody), "class already exists") {
 		t.Errorf("expected parsing error, but got: %s", string(resBody))
 	}
@@ -345,4 +283,15 @@ func TestBookClass_ok(t *testing.T) {
 	if strings.Contains(string(resBody), `"class_date": "1994-02-24"`) {
 		t.Errorf("expected response to contain class_date, got %d", resBody)
 	}
+}
+
+func putClasses(app *fiber.App, payload string) (*http.Response, error) {
+	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader([]byte(payload)))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("content-type", "application/json")
+
+	return app.Test(req)
 }
