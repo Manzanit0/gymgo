@@ -6,27 +6,27 @@ import (
 )
 
 // Current storage for classes.
+var classes = []*Class{}
 var classesByDate = make(map[time.Time]*Class)
-var uniqueClasses = []*Class{}
 
 type Class struct {
 	Name            string
-	StartDate       time.Time
-	EndDate         time.Time
+	StartOn         time.Time
+	EndOn           time.Time
 	Capacity        int
 	BookedInMembers []string
 }
 
-func CreateClass(name string, startDate time.Time, endDate time.Time, capacity int) error {
+func CreateClass(name string, startOn time.Time, endOn time.Time, capacity int) error {
 	if name == "" {
 		return fmt.Errorf("cannot create class without name")
 	}
 
-	if startDate == (time.Time{}) {
+	if startOn == (time.Time{}) {
 		return fmt.Errorf("cannot create class without start date")
 	}
 
-	if endDate == (time.Time{}) {
+	if endOn == (time.Time{}) {
 		return fmt.Errorf("cannot create class without end date")
 	}
 
@@ -34,33 +34,33 @@ func CreateClass(name string, startDate time.Time, endDate time.Time, capacity i
 		return fmt.Errorf("cannot create class without capacity")
 	}
 
-	startDate = truncateToDate(startDate)
-	endDate = truncateToDate(endDate)
+	startOn = truncateToDate(startOn)
+	endOn = truncateToDate(endOn)
 
-	days := int(endDate.Sub(startDate).Hours() / 24)
+	days := int(endOn.Sub(startOn).Hours() / 24)
 	fmt.Println(days)
 	if days < 0 {
 		return fmt.Errorf("end date cannot be smaller than start date")
 	}
 
 	for i := 0; i <= days; i++ {
-		d := startDate.Add(time.Hour * 24 * time.Duration(i))
+		d := startOn.Add(time.Hour * 24 * time.Duration(i))
 		if _, exists := classesByDate[d]; exists {
 			return fmt.Errorf("class already exists in day %s", d.Format("2006-01-02"))
 		}
 	}
 
 	for i := 0; i <= days; i++ {
-		d := startDate.Add(time.Hour * 24 * time.Duration(i))
+		d := startOn.Add(time.Hour * 24 * time.Duration(i))
 		class := &Class{
-			Name:      name,
-			StartDate: startDate,
-			EndDate:   endDate,
-			Capacity:  capacity,
+			Name:     name,
+			StartOn:  startOn,
+			EndOn:    endOn,
+			Capacity: capacity,
 		}
 
 		classesByDate[d] = class
-		uniqueClasses = append(uniqueClasses, class)
+		classes = append(classes, class)
 	}
 
 	return nil
@@ -83,7 +83,7 @@ func BookClass(memberName string, classDate time.Time) error {
 
 func GetClasses() []Class {
 	array := []Class{}
-	for _, c := range uniqueClasses {
+	for _, c := range classes {
 		array = append(array, *c)
 	}
 	return array
@@ -96,5 +96,5 @@ func GetClass(t time.Time) Class {
 
 func DeleteClasses() {
 	classesByDate = make(map[time.Time]*Class)
-	uniqueClasses = []*Class{}
+	classes = []*Class{}
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/manzanit0/gymgo/pkg/classes"
 )
 
-func TestCreateClass_successful(t *testing.T) {
+func TestCreateClass_ok(t *testing.T) {
 	t.Cleanup(func() {
 		classes.DeleteClasses()
 	})
