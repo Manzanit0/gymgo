@@ -209,3 +209,37 @@ func TestCreateClass_invalidDate(t *testing.T) {
 		t.Errorf("expected parsing error, but got: %s", string(resBody))
 	}
 }
+
+func TestCreateClass_startDateIsSmaller(t *testing.T) {
+	app := fiber.New()
+	setupRouter(app)
+
+	body := []byte(`
+	{
+		"name": "Foo",
+		"start_date": "1993-02-24",
+		"end_date": "1993-02-21",
+		"capacity": 20
+	}`)
+
+	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
+	if err != nil {
+		t.Errorf("error %v not expected", err.Error())
+	}
+
+	req.Header.Add("content-type", "application/json")
+
+	res, err := app.Test(req)
+	if err != nil {
+		t.Errorf("error %v not expected", err.Error())
+	}
+
+	if res.StatusCode != 400 {
+		t.Errorf("expected status 400, got %d", res.StatusCode)
+	}
+
+	resBody, _ := ioutil.ReadAll(res.Body)
+	if !strings.Contains(string(resBody), "end date cannot be smaller than start date") {
+		t.Errorf("expected parsing error, but got: %s", string(resBody))
+	}
+}

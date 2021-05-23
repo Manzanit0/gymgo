@@ -37,6 +37,10 @@ func CreateClass(name string, startDate time.Time, endDate time.Time, capacity i
 	endDate = truncateToDate(endDate)
 
 	days := int(endDate.Sub(startDate).Hours() / 24)
+	fmt.Println(days)
+	if days < 0 {
+		return fmt.Errorf("end date cannot be smaller than start date")
+	}
 
 	for i := 0; i <= days; i++ {
 		d := startDate.Add(time.Hour * 24 * time.Duration(i))

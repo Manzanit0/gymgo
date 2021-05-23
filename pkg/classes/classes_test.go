@@ -67,6 +67,19 @@ func TestCreateClass_overlappingClassError(t *testing.T) {
 	}
 }
 
+func TestCreateClass_endDateIsSmallerError(t *testing.T) {
+	err := CreateClass("foo", time.Now(), time.Now().Add(-24*time.Hour), 3)
+	if err == nil {
+		t.Errorf("expected error, got nil")
+	}
+
+	want := "end date cannot be smaller than start date"
+	got := err.Error()
+	if want != got {
+		t.Errorf("want: %s, got: %s", want, got)
+	}
+}
+
 func TestCreateClass_ok(t *testing.T) {
 	t.Cleanup(func() {
 		DeleteClasses()
