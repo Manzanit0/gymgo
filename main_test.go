@@ -8,9 +8,14 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/manzanit0/gymgo/pkg/classes"
 )
 
 func TestCreateClass_successful(t *testing.T) {
+	t.Cleanup(func() {
+		classes.DeleteClasses()
+	})
+
 	app := fiber.New()
 	setupRouter(app)
 

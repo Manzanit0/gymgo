@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Current storage for classesByDate.
+// Current storage for classes.
 var classesByDate = make(map[time.Time]*Class)
 var uniqueClasses = []*Class{}
 
@@ -76,4 +76,9 @@ func GetClasses() []Class {
 func GetClass(t time.Time) Class {
 	t = truncateToDate(t)
 	return *classesByDate[t]
+}
+
+func DeleteClasses() {
+	classesByDate = make(map[time.Time]*Class)
+	uniqueClasses = []*Class{}
 }

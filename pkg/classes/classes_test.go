@@ -47,6 +47,10 @@ func TestCreateClass_invalidCapacityError(t *testing.T) {
 }
 
 func TestCreateClass_overlappingClassError(t *testing.T) {
+	t.Cleanup(func() {
+		DeleteClasses()
+	})
+
 	err := CreateClass("foo", time.Now(), time.Now(), 5)
 	if err != nil {
 		t.Errorf("Expected no error, got: %s", err.Error())
@@ -64,6 +68,10 @@ func TestCreateClass_overlappingClassError(t *testing.T) {
 }
 
 func TestCreateClass_ok(t *testing.T) {
+	t.Cleanup(func() {
+		DeleteClasses()
+	})
+
 	err := CreateClass("foo", time.Now(), time.Now(), 5)
 	if err != nil {
 		t.Errorf("Expected no error, got: %s", err.Error())
@@ -71,6 +79,10 @@ func TestCreateClass_ok(t *testing.T) {
 }
 
 func TestCreateClass_multipleClassesOk(t *testing.T) {
+	t.Cleanup(func() {
+		DeleteClasses()
+	})
+
 	err := CreateClass("foo", time.Now(), time.Now(), 5)
 	if err != nil {
 		t.Errorf("Expected no error, got: %s", err.Error())
