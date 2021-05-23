@@ -1,5 +1,7 @@
 # Gymgo
 
+[![test](https://github.com/Manzanit0/gymgo/actions/workflows/test.yml/badge.svg)](https://github.com/Manzanit0/gymgo/actions/workflows/test.yml)
+
 Gymgo is an application for boutiques, studios,and gyms which allows business
 owners to manage their courses, classes, members, memberships etc,
 
