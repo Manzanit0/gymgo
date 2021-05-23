@@ -2,6 +2,7 @@ package classes
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -129,5 +130,43 @@ func TestCreateClass_multipleClassesOk(t *testing.T) {
 	c = GetClass(time.Now().Add(2 * 24 * time.Hour))
 	if c.Name != "baz" {
 		t.Errorf("Expected class 'baz', got '%s'", c.Name)
+	}
+}
+
+func TestBookClass_ok(t *testing.T) {
+	t.Cleanup(func() {
+		DeleteClasses()
+	})
+
+	err := CreateClass("foo", time.Now(), time.Now(), 5)
+	if err != nil {
+		t.Errorf("Expected no error, got: %s", err.Error())
+	}
+
+	err = BookClass("Ben", time.Now())
+	if err != nil {
+		t.Errorf("Expected no error, got: %s", err.Error())
+	}
+
+	err = BookClass("James", time.Now())
+	if err != nil {
+		t.Errorf("Expected no error, got: %s", err.Error())
+	}
+
+	c := GetClass(time.Now())
+	if len(c.BookedInMembers) != 2 {
+		t.Errorf("Expected 2 bookings, got %d", len(c.BookedInMembers))
+	}
+
+	if !reflect.DeepEqual(c.BookedInMembers, []string{"Ben", "James"}) {
+		t.Errorf("Expected booked members to be ['Ben', 'James'], got %v", c.BookedInMembers)
+	}
+}
+
+func TestBookClass_noMatchingDate(t *testing.T) {
+	err := BookClass("foo", time.Now())
+	want := fmt.Errorf("there are no classes on %s", time.Now().Format("2006-01-02"))
+	if err.Error() != want.Error() {
+		t.Errorf("Expected error '%s', got: '%s'", want.Error(), err.Error())
 	}
 }

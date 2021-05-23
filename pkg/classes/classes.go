@@ -10,10 +10,11 @@ var classesByDate = make(map[time.Time]*Class)
 var uniqueClasses = []*Class{}
 
 type Class struct {
-	Name      string
-	StartDate time.Time
-	EndDate   time.Time
-	Capacity  int
+	Name            string
+	StartDate       time.Time
+	EndDate         time.Time
+	Capacity        int
+	BookedInMembers []string
 }
 
 func CreateClass(name string, startDate time.Time, endDate time.Time, capacity int) error {
@@ -67,6 +68,17 @@ func CreateClass(name string, startDate time.Time, endDate time.Time, capacity i
 
 func truncateToDate(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
+}
+
+func BookClass(memberName string, classDate time.Time) error {
+	classDate = truncateToDate(classDate)
+	c, ok := classesByDate[classDate]
+	if !ok {
+		return fmt.Errorf("there are no classes on %s", classDate.Format("2006-01-02"))
+	}
+
+	c.BookedInMembers = append(c.BookedInMembers, memberName)
+	return nil
 }
 
 func GetClasses() []Class {
