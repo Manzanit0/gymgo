@@ -243,3 +243,48 @@ func TestCreateClass_startDateIsSmaller(t *testing.T) {
 		t.Errorf("expected parsing error, but got: %s", string(resBody))
 	}
 }
+
+func TestCreateClass_cannotOverwriteAnExistingClass(t *testing.T) {
+	t.Cleanup(func() {
+		classes.DeleteClasses()
+	})
+
+	app := fiber.New()
+	setupRouter(app)
+
+	body := []byte(`
+	{
+		"name": "Foo",
+		"start_date": "1993-02-24",
+		"end_date": "2021-04-21",
+		"capacity": 20
+	}`)
+
+	req, err := http.NewRequest("PUT", "http://10.0.0.1/classes", bytes.NewReader(body))
+	if err != nil {
+		t.Errorf("error %v not expected", err.Error())
+	}
+
+	req.Header.Add("content-type", "application/json")
+
+	// Run the same request twice to provoke a duplicate class.
+	res, err := app.Test(req)
+	res, err = app.Test(req)
+	if err != nil {
+		t.Errorf("error %v not expected", err.Error())
+	}
+
+	resBody, _ := ioutil.ReadAll(req.Body)
+	if string(resBody) != string(body) {
+		t.Errorf("response should contain request entity, but got %s", string(resBody))
+	}
+
+	if res.StatusCode != 400 {
+		t.Errorf("expected status 400, got %d", res.StatusCode)
+	}
+
+	resBody, _ = ioutil.ReadAll(res.Body)
+	if !strings.Contains(string(resBody), "class already exists") {
+		t.Errorf("expected parsing error, but got: %s", string(resBody))
+	}
+}
