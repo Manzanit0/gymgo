@@ -29,9 +29,8 @@ in the worst scenario.
 
 To address this potential performance issue, a dictionary mapping classes by
 date was also added, transforming then the search of a class for booking into an
-O(1) operations instead of O(n). Nonetheless, this brings other issues to the
-table, like having to keep both data structures in sync. Currently it's a
-non-issue, but definitely something to keep in mind.
+O(1) operation instead of O(n). However, this brings other issues to the
+table, like having to keep both data structures in sync.
 
 ### Using a package for the domain
 
