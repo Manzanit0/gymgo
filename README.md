@@ -45,3 +45,32 @@ I've decided to differentiate the layers to showcase how I would go about the
 solution as it evolves: as the platform grows we want to have our APIs to be as
 thin as we can, and keep all the business logic in a domain layer that we can
 reuse throughout different services.
+
+## 📃 Regarding the RESTful design
+
+In the API, the approach taken was to make both endpoints use the `PUT` method
+because it communicates entity creation. However, they're not the purest of PUTs.
+The reason is that ideally a `PUT` endpoint should be idempotent and deal with
+being called several times gracefully, replacing the resource at hand. We could
+argue it should be a `POST` and not a `PUT`. Nonetheless, I have maintained it and
+`PUT` because I believe it keeps the main promise: requests are side-effects-free,
+and the verb transmits intent.
+
+If I were to further improve the API I'd say it would be along the following lines:
+
+1. Leverage a purer RESTful approach and allow the consumers of the API to provide 
+   an ID for the resource in the request URI, thus allowing the API to discern the
+   resource that the request is refering to. This empowers truly idempotent endpoints
+   where any `PUT` endpoint can actually replace the previous entity with the new one
+   provided. Currently we're making a series of assumptions which don't allow for
+   updating resources.
+
+2. Remove the bodies from the responses. Initially I thought that it would be
+   useful to respond with the information of the created entity, but when checking
+   [MDN's documentation](0), it's not a common practice to do so.
+
+3. Instead of returning a _generic_ `400 Bad Request` every time the user attempts
+   to create or book a class but fails due to some precondition not being met, we
+   could leverage a `409 Conflict` for some scenarios.
+
+[0]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT
